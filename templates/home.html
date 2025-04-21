@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Tresor</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Account Tresor</h1>
+        <p>Willkommen! Bitte logge dich ein oder registriere dich.</p>
+        <div class="buttons">
+            <a href="{{ url_for('login') }}" class="btn">Login</a>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary">Registrieren</a>
+        </div>
+    </div>
+</body>
+</html>

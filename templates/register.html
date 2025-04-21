@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrieren</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Registrieren</h1>
+        <p>Erstelle ein neues Konto, um deinen Passwort-Tresor zu benutzen.</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            <input name="username" placeholder="Benutzername" required>
+            <input name="password" type="password" placeholder="Passwort" required>
+            <button type="submit">Registrieren</button>
+        </form>
+
+        <a href="/login" class="login-link">Schon ein Konto? → Einloggen</a>
+    </div>
+</body>
+</html>

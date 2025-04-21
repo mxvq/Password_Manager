@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Passwort bearbeiten</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>✏️ Accountdetails bearbeiten</h1>
+        <p>Ändere die Details des gespeicherten Accounts.</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            <label for="site">🔗 Seite / App:</label><br>
+            <input type="text" id="site" name="site" value="{{site}}" required><br><br>
+
+            <label for="username">👤 Benutzername:</label><br>
+            <input type="text" id="username" name="username" value="{{username}}" required><br><br>
+
+            <label for="password">🔒 Passwort:</label><br>
+            <input type="text" id="password" name="password" value="{{password}}" required><br><br>
+
+            <button type="submit">💾 Änderungen Speichern</button>
+        </form>
+
+        <a href="/vault" class="login-link">Zurück zum Tresor</a>
+    </div>
+</body>
+</html>
