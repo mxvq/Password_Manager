@@ -26,6 +26,8 @@
 
             <label for="password">🔒 Passwort:</label><br>
             <input type="text" id="password" name="password" value="{{password}}" required oninput="checkStrength(this.value)"><br><br>
+            <button type="button" onclick="generatePassword()">🔁Generieren
+            </button>
                         <div id="strengthBar" style="height: 5px; width: 100%; background-color: #eee; margin-top: 5px;">
                 <div id="strengthLevel" style="height: 100%; width: 0%; background-color: red;"></div>
             </div>
@@ -37,5 +39,6 @@
         <a href="{{ url_for('vault') }}" class="login-link">Zurück zum Tresor</a>
     </div>
 <script src="{{ url_for('static', filename='js/password_strength.js') }}"></script>
+<script src="{{ url_for('static', filename='js/generatePassword.js') }}"></script>
 </body>
 </html>
