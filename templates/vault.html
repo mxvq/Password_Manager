@@ -22,7 +22,13 @@
                 <td>{{acc.site}}</td>
                 <td>{{acc.email}}</td>
                 <td>{{acc.username}}</td>
-                <td>{{acc.password}}</td>
+                <td>
+                    <div style="display: inline-flex; align-items: center;">
+                    <span id="pw-{{ acc.id }}">{{ acc.password }}</span>
+                    <button class ="copy-button" onclick="copyToClipboard('pw-{{ acc.id }}', 'copied-{{ acc.id }}')" title="Passwort kopieren">📋</button>
+                        <span id="copied-{{ acc.id }}" class="copy-feedback">✔️ Kopiert!</span>
+                    </div>
+                </td>
                 <td><a href="{{ url_for('edit_account_details', id=acc.id) }}"> ✏️ bearbeiten</a> |
                     <a href="{{ url_for('delete_account_details', id=acc.id) }}">❌ löschen</a>
                 </td>
@@ -32,5 +38,6 @@
         </div>
         <p><a href="{{ url_for('add_account_details') }}">➕ Neue Accountdaten hinzufügen</a> | <a href="{{ url_for('logout') }}">🚪 Ausloggen</a></p>
     </div>
+<script src="{{ url_for('static', filename='js/copyToClipboard.js') }}"></script>
 </body>
 </html>

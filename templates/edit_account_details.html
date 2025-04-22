@@ -26,13 +26,11 @@
 
             <label for="password">🔒 Passwort:</label><br>
             <input type="text" id="password" name="password" value="{{password}}" required oninput="checkStrength(this.value)"><br><br>
-            <button type="button" onclick="generatePassword()">🔁Generieren
-            </button>
                         <div id="strengthBar" style="height: 5px; width: 100%; background-color: #eee; margin-top: 5px;">
                 <div id="strengthLevel" style="height: 100%; width: 0%; background-color: red;"></div>
             </div>
             <p id="strengthText" style="font-size: 0.9em; text-align: left; margin-top: 4px;">Passwortstärke: </p>
-
+            <button type="button" onclick="generatePassword()">🔁 Passwort generieren</button>
             <button type="submit">💾 Änderungen Speichern</button>
         </form>
 
