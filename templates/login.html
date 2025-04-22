@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -20,7 +20,7 @@
             <button type="submit">Einloggen</button>
         </form>
 
-        <a href="/register" class="login-link">Noch kein Konto? → Registrieren</a>
+        <a href="{{ url_for('register') }}" class="login-link">Noch kein Konto? → Registrieren</a>
     </div>
 </body>
 </html>

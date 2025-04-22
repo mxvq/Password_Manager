@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Registrieren</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -17,11 +17,16 @@
         <form method="post">
             <input type="email" name="email" placeholder="E-Mail" required>
             <input name="username" placeholder="Benutzername" required>
-            <input name="password" type="password" placeholder="Passwort" required>
+            <input name="password" type="password" placeholder="Passwort" required oninput="checkStrength(this.value)">
+            <div id="strengthBar" style="height: 5px; width: 100%; background-color: #eee; margin-top: 5px;">
+                <div id="strengthLevel" style="height: 100%; width: 0%; background-color: red;"></div>
+            </div>
+            <p id="strengthText" style="font-size: 0.9em; text-align: left; margin-top: 4px;">Passwortstärke: </p>
             <button type="submit">Registrieren</button>
         </form>
 
-        <a href="/login" class="login-link">Schon ein Konto? → Einloggen</a>
+        <a href="{{ url_for('login') }}" class="login-link">Schon ein Konto? → Einloggen</a>
     </div>
+<script src="{{ url_for('static', filename='js/password_strength.js') }}"></script>
 </body>
 </html>

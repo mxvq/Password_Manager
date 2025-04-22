@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Passwort bearbeiten</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -25,12 +25,17 @@
             <input type="text" id="username" name="username" value="{{username}}" required><br><br>
 
             <label for="password">🔒 Passwort:</label><br>
-            <input type="text" id="password" name="password" value="{{password}}" required><br><br>
+            <input type="text" id="password" name="password" value="{{password}}" required oninput="checkStrength(this.value)"><br><br>
+                        <div id="strengthBar" style="height: 5px; width: 100%; background-color: #eee; margin-top: 5px;">
+                <div id="strengthLevel" style="height: 100%; width: 0%; background-color: red;"></div>
+            </div>
+            <p id="strengthText" style="font-size: 0.9em; text-align: left; margin-top: 4px;">Passwortstärke: </p>
 
             <button type="submit">💾 Änderungen Speichern</button>
         </form>
 
-        <a href="/vault" class="login-link">Zurück zum Tresor</a>
+        <a href="{{ url_for('vault') }}" class="login-link">Zurück zum Tresor</a>
     </div>
+<script src="{{ url_for('static', filename='js/password_strength.js') }}"></script>
 </body>
 </html>
