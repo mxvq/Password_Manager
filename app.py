@@ -18,6 +18,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
 
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,6 +27,7 @@ class Account(db.Model):
     password = db.Column(db.String(150), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('passwords', lazy=True))
+    email = db.Column(db.String(120), nullable=False)
 
 @app.route('/')
 def home():
@@ -39,14 +41,15 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        email = request.form['email']
 
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
-            return render_template('register.html', error="Benutzername bereits vergeben!")
+            return render_template('register.html', error="Benutzername oder E-Mail bereits vergeben!")
 
         hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
 
-        new_user = User(username=username, password=hashed_pw)
+        new_user = User(username=username, email=email, password=hashed_pw)
         db.session.add(new_user)
         db.session.commit()
 
@@ -60,12 +63,14 @@ def login():
         return redirect(url_for('home'))
 
     if request.method == 'POST':
-        username = request.form['username']
+        login_input = request.form['username']
         password = request.form['password']
 
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter(
+            (User.username == login_input) | (User.email == login_input)
+        ).first()
         if not user or not check_password_hash(user.password, password):
-            return render_template('login.html', error="Ungültiger Benutzername oder Passwort!")
+            return render_template('login.html', error="Ungültiger Benutzername/E-Mail oder Passwort!")
 
         session['user_id'] = user.id
         session['username'] = user.username
@@ -89,16 +94,16 @@ def add_account_details():
         site = request.form['site']
         username = request.form['username']
         password = request.form['password']
+        email = request.form['email']
 
         current_user = User.query.get(session['user_id'])
 
         if not current_user:
             return render_template('add_account_details.html', error="Benutzer nicht gefunden!")
 
-        new_account = Account(site=site, username=username, password=password, user_id=current_user.id)
+        new_account = Account(site=site, username=username, password=password, email=email, user_id=current_user.id)
         db.session.add(new_account)
         db.session.commit()
-        print("test")
 
         return redirect(url_for('vault'))
 
@@ -113,10 +118,8 @@ def vault():
     user = User.query.get(session['user_id'])
     user_accounts = Account.query.filter_by(user_id=user.id).all()
 
-    print("Vault aufgerufen von User ID:", session.get('user_id'))
-    print("Anzahl Accounts gefunden:", len(user_accounts))
-
     return render_template('vault.html', user_accounts=user_accounts)
+
 
 @app.route('/edit_account_details/<int:id>', methods=['GET', 'POST'])
 def edit_account_details(id):
@@ -132,14 +135,15 @@ def edit_account_details(id):
         account_to_edit.site = request.form['site']
         account_to_edit.username = request.form['username']
         account_to_edit.password = request.form['password']
+        account_to_edit.email = request.form['email']
 
         db.session.commit()
 
         return redirect(url_for('vault'))
 
-    return render_template('edit_account_details.html', site=account_to_edit.site, username=account_to_edit.username, password=account_to_edit.password)
+    return render_template('edit_account_details.html', site=account_to_edit.site, username=account_to_edit.username, password=account_to_edit.password, email=account_to_edit.email)
 
-@app.route('/delete_account_details/<int:id>', methods=['GET', 'POST'])
+@app.route('/delete_account_details/<int:id>', methods=['POST', 'GET'])
 def delete_account_details(id):
     if 'user_id' not in session:
         return redirect('/login')
