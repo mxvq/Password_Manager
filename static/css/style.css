@@ -67,7 +67,7 @@ button {
 }
 
 /* Hover-Effekt für Button */
-button:not(.link-button):hover {
+button:not(.link-button):not(.copy-button):hover {
     background-color: #0056b3;
 }
 

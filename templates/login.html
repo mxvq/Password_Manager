@@ -17,6 +17,8 @@
         <form method="post">
             <input name="username" placeholder="Benutzername oder E-Mail" required>
             <input name="password" type="password" placeholder="Passwort" required>
+            <p style="margin-top: 4px; font-size: 0.9em; text-align: left">
+            <a href="{{ url_for('reset_request') }}">Passwort vergessen?</a>
             <button type="submit">Einloggen</button>
         </form>
 

@@ -1,9 +1,11 @@
 import secrets
 
+from flask_mail import Mail, Message
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeTimedSerializer
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
@@ -11,6 +13,15 @@ app.secret_key = secrets.token_hex(16)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'nightlp777@gmail.com'
+app.config['MAIL_PASSWORD'] = 'hcfivkmnaagtrago'
+app.config['MAIL_DEFAULT_SENDER'] = 'accounttresor'
+
+mail = Mail(app)
 
 db = SQLAlchemy(app)
 
@@ -19,6 +30,19 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+
+    def get_reset_token(self, expires_sec=1800):
+        s = URLSafeTimedSerializer(app.secret_key)
+        return s.dumps(self.id, salt='password-reset')
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = URLSafeTimedSerializer(app.secret_key)
+        try:
+            user_id = s.loads(token, salt='password-reset', max_age=1800)
+        except:
+            return None
+        return User.query.get(user_id)
 
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -78,6 +102,51 @@ def login():
         return redirect(url_for('vault'))
 
     return render_template('login.html', error=None)
+
+@app.route('/reset_request', methods=['GET', 'POST'])
+def reset_request():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = user.get_reset_token()
+            reset_url = url_for('reset_token', token=token, _external=True)
+            msg = Message('Passwort zurücksetzen',
+                          recipients=[user.email])
+            msg.body = f'''Hallo {user.username},
+
+Du hast eine Zurücksetzung deines Passworts angefordert.
+
+Klicke auf den folgenden Link, um ein neues Passwort zu setzen:
+
+{reset_url}
+
+Wenn du das nicht warst, ignoriere diese E-Mail.
+
+Viele Grüße,
+Dein Account Tresor
+'''
+            mail.send(msg)
+            return render_template('reset_request.html', message="E-Mail zum Zurücksetzen wurde gesendet.")
+        else:
+            return render_template('reset_request.html', error="E-Mail nicht gefunden.")
+
+    return render_template('reset_request.html')
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_token(token):
+    user = User.verify_reset_token(token)
+    if not user:
+        return "Link ist ungültig oder abgelaufen."
+
+    if request.method == 'POST':
+        password = request.form['password']
+        hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
+        user.password = hashed_pw
+        db.session.commit()
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html')
 
 
 @app.route('/logout')
